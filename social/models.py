@@ -15,12 +15,13 @@ class Post(models.Model, HitCountMixin):
     uid = models.UUIDField(default=uuid4)
 
     content = models.TextField()
-    image = models.URLField(null=True, blank=True)
-    voice_recording = models.URLField(null=True, blank=True)
+    images = models.CharField(max_length=500, null=True, blank=True) #TODO change to multiple images
+    videos = models.CharField(max_length=500, null=True, blank=True) #TODO 
+    voice_recording = models.CharField(max_length=500, null=True, blank=True)
     user_uid = models.UUIDField() 
     date_updated = models.DateTimeField(auto_now=True)
     date_created = models.DateTimeField(auto_now_add=True)
-
+    expiry = models.DateTimeField(null= True)
     likes = GenericRelation(Like)
 
     views = GenericRelation(HitCount, object_id_field="object_pk", related_query_name="views_relation" ) 
