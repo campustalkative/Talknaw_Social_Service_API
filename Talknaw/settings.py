@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-netis!(re+fb-cprn4vk9yuc7nrk^091zq5q#kp25r_@*qupgk'
+SECRET_KEY = 'insecure-wuylv9a5lfgi*@vlk1ij75uvepq21s8k-cb549*&iuvgjui95s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -41,14 +41,18 @@ INSTALLED_APPS = [
     "corsheaders",
     "debug_toolbar",
     "hitcount",
+    "rest_framework",
     
     'social', 
     'likes',
+    'users',
 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'users.middleware.UserIDMiddleware',
+    'users.middleware.UserIDJWTMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -93,6 +97,13 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PERMISSION_CLASSES': [
+        'users.permissions.IsAuthenticated',
+
+    ]
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -153,14 +164,10 @@ CACHES = {
 
 # ? Documentation Settings
 SPECTACULAR_SETTINGS = {
-    "TITLE": "RentRite API",
+    "TITLE": "Talknaw Social API",
     "DESCRIPTION": "A better Home makes a better Family",
-    "VERSION": "1.0",
+    "VERSION": "0.0.1",
     "SERVE_INCLUDE_SCHEMA": False,
-    "SWAGGER_UI_DIST": "SIDECAR",  # shorthand to use the sidecar instead
-    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
-    "REDOC_DIST": "SIDECAR",
-    # "ENUM_NAME_OVERRIDES" :{"Category57aEnum": "CategoryEnum"}
     # OTHER SETTINGS
     "DISABLE_ERRORS_AND_WARNINGS": True,
     "SCHEMA_COERCE_PATH_PK_SUFFIX": True,

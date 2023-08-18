@@ -9,12 +9,11 @@ from uuid import UUID
 class LikeView (APIView):
 
     serializer_class = LikeSerializer  # default
-    permission_classes = [permissions.IsAuthenticated]
     unlike = False
 
     def post(self, request):
         serializer = self.serializer_class(
-            data=request.data, context={'user': request.user})
+            data=request.data, context={'user_id': request.user_id})
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
         if instance is None:

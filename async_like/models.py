@@ -1,6 +1,4 @@
-from uuid import uuid4
-
-from django.conf import settings
+# models.py
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -21,8 +19,11 @@ class LikesManager(models.Manager):
 
 
 class Like(models.Model):
-    objects = LikesManager
+    objects = LikesManager()
     user_id = models.UUIDField()
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField(default=uuid4)
+    object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
+
+
+# views.py (using Django Ninja)
