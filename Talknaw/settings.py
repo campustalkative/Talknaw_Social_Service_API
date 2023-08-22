@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'social', 
     'likes',
     'users',
+    'utils',
+    'core'
 
 ]
 
@@ -102,7 +104,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'users.permissions.IsAuthenticated',
 
-    ]
+    ],
+    'EXCEPTION_HANDLER': 'utils.exception_handlers.custom_exception_handler'
 }
 
 # Password validation

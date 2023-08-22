@@ -1,6 +1,7 @@
 from jose import jwt
 from django.conf import settings
 
+from jose.exceptions import ExpiredSignatureError, JWTError
 class UserIDMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
@@ -26,9 +27,9 @@ class UserIDJWTMiddleware:
             try:
                 decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
                 user_id = decoded_token.get('user_id')
-            except jwt.ExpiredSignatureError:
+            except ExpiredSignatureError:
                 user_id = None
-            except jwt.InvalidTokenError:
+            except JWTError:
                 user_id = None
         else:
             user_id = None

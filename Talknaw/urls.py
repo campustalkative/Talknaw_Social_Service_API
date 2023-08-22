@@ -23,28 +23,30 @@ from drf_spectacular.views import (
 )
 from django.conf import settings
 from django.conf.urls.static import static
+from core.views import api, return_home_to_docs
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("", return_home_to_docs),
     path("", include("social.urls")),
     path("", include("users.urls")),
     path("__debug__/", include("debug_toolbar.urls")),
-    # path("", include('playground.urls'))
+    path("api/", api.urls),
 ]
 
 # # Documentation paths
 
 urlpatterns += [
-    # YOUR PATTERNS
+    # YOUR PATTERNS 
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     # Optional UI:
     path(
-        "api/docs",
+        "api/docs/spec",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-schema",
     ),
     path(
-        "api/redocs",
+        "api/redocs/spec",
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc-schema",
     ),

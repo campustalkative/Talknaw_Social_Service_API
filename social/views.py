@@ -12,6 +12,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from likes.views import LikeView
 from users.models import Profile
+from utils.exception_handlers import ErrorResponse
 from utils.helpers import custom_cache_decorator
 
 # from .filters import ApartmentFilter
@@ -92,28 +93,35 @@ class PostViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         profile = get_object_or_404(Profile, user_id=request.user_id)
         serializer = CreatePostSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
 
-        data = serializer.validated_data
+        if serializer.is_valid():
+            # serializer.is_valid(raise_exception=True)
 
-        images = data.pop("pictures", [])
-        videos = data.pop("videos", [])
+            data = serializer.validated_data
 
-        new_post = Post.objects.create(**data, profile=profile)
+            images = data.pop("pictures", [])
+            videos = data.pop("videos", [])
 
-        if images:
-            pics = [Picture(image=img, post=new_post) for img in images]
+            new_post = Post.objects.create(**data, profile=profile)
 
-            Picture.objects.bulk_create(pics)
+            if images:
+                pics = [Picture(image=img, post=new_post) for img in images]
 
-        if videos:
-            vids = [Video(clip=clip, post=new_post) for clip in videos]
+                Picture.objects.bulk_create(pics)
 
-            Video.objects.bulk_create(vids)
+            if videos:
+                vids = [Video(clip=clip, post=new_post) for clip in videos]
 
-        serializer = PostSerializer(new_post)
+                Video.objects.bulk_create(vids)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer = PostSerializer(new_post)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(
+            ErrorResponse("Validation Error", serializer.errors),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 class LikePostView(LikeView):
@@ -134,11 +142,9 @@ class LikePostView(LikeView):
         )
 
 
-
 class CommentViewSet(ModelViewSet):
     lookup_field = "uid"
     http_method_names = ["get", "post", "patch", "delete"]
-
 
     def get_queryset(self):
         post = get_object_or_404(Post, uid=self.kwargs["post_uid"])
@@ -167,7 +173,6 @@ class CommentViewSet(ModelViewSet):
 
 class LikeCommentView(LikeView):
     serializer_class = LikeCommentSerializer
-
 
     def post(self, request):
         super().post(request)
