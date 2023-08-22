@@ -102,7 +102,7 @@ DATABASES = {
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PERMISSION_CLASSES': [
-        'users.permissions.IsAuthenticated',
+        'core.permissions.IsAuthenticated',
 
     ],
     'EXCEPTION_HANDLER': 'utils.exception_handlers.custom_exception_handler'

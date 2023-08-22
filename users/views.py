@@ -1,38 +1,18 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import serializers, status
+from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Profile, UserWatching
+from utils.exception_handlers import ErrorResponse
 
-
-class ProfileSerializer(serializers.Serializer):
-    user_id = serializers.UUIDField()
-    name = serializers.CharField()
-    username = serializers.CharField()
-    picture = serializers.CharField(allow_blank=True)
-    bio = serializers.CharField(allow_blank=True)
-    watchers_count = serializers.IntegerField()
-    watching_count = serializers.IntegerField()
-
-
-class ProfileUpdateSerializer(serializers.Serializer):
-    picture = serializers.CharField(allow_blank=True)
-    bio = serializers.CharField(allow_blank=True)
-
-    def save(self, **kwargs):
-        data = {k: v for k, v in self.validated_data.items() if v}
-
-        if data:
-            for k, v in data.items():
-                setattr(self.instance, k, v)
-
-        return self.instance.save()
-
-
-class UserWatchSerializer(serializers.Serializer):
-    watching_user_id = serializers.UUIDField()
+from .models import Profile, Skill, UserWatching
+from .serializers import (
+    ProfileSerializer,
+    ProfileUpdateSerializer,
+    SkillSerializer,
+    UserWatchSerializer,
+)
 
 
 class ProfileView(GenericAPIView):
@@ -55,6 +35,17 @@ class ProfileView(GenericAPIView):
         if self.request.method == "PATCH":
             return ProfileUpdateSerializer
         return ProfileSerializer
+
+
+class GetAProfile(APIView):
+    def get(self, request, user_id):
+        profile = get_object_or_404(Profile, user_id=user_id)
+
+        serializer = ProfileSerializer(profile)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    ...
 
 
 class GetWatchers(APIView):
@@ -111,7 +102,7 @@ class StartWatching(APIView):
         other_user_profile = get_object_or_404(
             Profile, user_id=serializer.validated_data["watching_user_id"]
         )
-        UserWatching.objects.create(
+        UserWatching.objects.get_or_create(
             user_id=user_profile,
             watching_user_id=other_user_profile,
         )
@@ -137,3 +128,52 @@ class StopWatching(APIView):
 
         serializer = ProfileSerializer(other_user_profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SkillView(GenericAPIView):
+    serializer_class = SkillSerializer
+
+    def post(self, request):
+        serializer = SkillSerializer(data=request.data)
+        if serializer.is_valid():
+            skill_names = serializer.validated_data.get("names")
+            skill_objs = []
+            for name in skill_names:
+                skill, _ = Skill.objects.get_or_create(name=name)
+                skill_objs.append(skill)
+
+            profile = Profile.objects.get(user_id=request.user_id)
+
+            profile.skills.add(*skill_objs)
+
+            serializer = ProfileSerializer(profile)
+
+            return Response(serializer.data, status=200)
+
+        return Response(
+            ErrorResponse("Validation error", serializer.errors), status=400
+        )
+
+    def delete(self, request):
+        serializer = SkillSerializer(data=request.data)
+        if serializer.is_valid():
+            skill_names = serializer.validated_data.get("names")
+            skill_objs = []
+            try:
+                for name in skill_names:
+                    skill = Skill.objects.get(name=name)
+                    skill_objs.append(skill)
+
+            except Skill.DoesNotExist:
+                pass
+
+            profile = Profile.objects.get(user_id=request.user_id)
+            profile.skills.remove(*skill_objs)
+
+            serializer = ProfileSerializer(profile)
+
+            return Response(serializer.data, status=200)
+
+        return Response(
+            ErrorResponse("Validation error", serializer.errors), status=400
+        )

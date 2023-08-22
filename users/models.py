@@ -24,6 +24,14 @@ class Profile(models.Model):
     def watching_count(self):
         return self.watching.count()
 
+    @property
+    def user_skills(self):
+        skills = []
+        for skill in self.skills.all():
+            skills.append(skill.name)
+        
+        return skills
+    
 
 class UserWatching(models.Model):
     user_id = models.ForeignKey(
