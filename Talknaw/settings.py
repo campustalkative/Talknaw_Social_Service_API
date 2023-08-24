@@ -143,7 +143,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATIC_ROOT = BASE_DIR / "staticfiles"
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -174,6 +174,7 @@ SPECTACULAR_SETTINGS = {
     # OTHER SETTINGS
     "DISABLE_ERRORS_AND_WARNINGS": True,
     "SCHEMA_COERCE_PATH_PK_SUFFIX": True,
+    "SCHEMA_PATH_PREFIX": "accounts"
 }
 LOGGING = {
     "version": 1,

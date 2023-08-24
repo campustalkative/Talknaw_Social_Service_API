@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    # command: "gunicorn --bind :8000 --workers 3 --timeout 120 SymplyFinance.wsgi:application" #"python3 manage.py runserver 0.0.0.0:8000" #
+    volumes:
+      - .:/app
+    container_name: talknaw_social
+    image: talknaw_social:v1

@@ -14,7 +14,9 @@ nested_router.register("comments", views.CommentViewSet, basename="posts-comment
 
 urlpatterns = [
     path("like/post", views.LikePostView.as_view()),
-    path("like/comment", views.LikeCommentView.as_view())
+    path("like/comment", views.LikeCommentView.as_view()),
+    path("bookmark", views.BookmarkView.as_view())
+
  
 
 ] + router.urls + nested_router.urls

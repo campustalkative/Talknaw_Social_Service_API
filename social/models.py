@@ -81,3 +81,9 @@ class Comment(BaseModel):
     @property
     def like_count(self):
         return self.likes.count()
+
+
+class Bookmark(models.Model):
+
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user_id  = models.UUIDField()

@@ -4,7 +4,7 @@ from likes.serializers import LikeSerializer
 from likes.models import Like
 from users.views import ProfileSerializer
 
-from .models import Comment, Picture, Post, Video
+from .models import Comment, Picture, Post, Video, Bookmark
 
 
 class PictureSerializer(serializers.ModelSerializer):
@@ -84,3 +84,9 @@ class LikeCommentSerializer(LikeSerializer):
     class Meta:
         model = Like
         fields = ["id", "comment_id"]
+
+
+
+class CreateBookmarkSerializer(serializers.Serializer):
+    post_id = serializers.UUIDField()
+    

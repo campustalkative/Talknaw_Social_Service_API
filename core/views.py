@@ -3,6 +3,7 @@ from users.models import Profile
 from ninja import Schema
 from uuid import UUID
 from django.shortcuts import redirect
+
 api = NinjaAPI(csrf=False)
 
 class ProfileSchema(Schema):
@@ -16,10 +17,7 @@ class ProfileSchema(Schema):
 def create_profile(request, profile_data: ProfileSchema):
 
     Profile.objects.create(**profile_data.dict())
-    print("See my life o")
     return{"status": "New profile created"}
-
-
 
 
 

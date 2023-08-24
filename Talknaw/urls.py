@@ -28,8 +28,8 @@ from core.views import api, return_home_to_docs
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", return_home_to_docs),
-    path("", include("social.urls")),
-    path("", include("users.urls")),
+    path("api/v1/", include("social.urls")),
+    path("api/v1/", include("users.urls")),
     path("__debug__/", include("debug_toolbar.urls")),
     path("api/", api.urls),
 ]

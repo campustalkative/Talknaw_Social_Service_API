@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from likes.views import LikeView
@@ -16,11 +17,12 @@ from utils.exception_handlers import ErrorResponse
 from utils.helpers import custom_cache_decorator
 
 # from .filters import ApartmentFilter
-from .models import Comment, Picture, Post, Video
+from .models import Bookmark, Comment, Picture, Post, Video
 from .pagination import PostPagination
 from .serializers import (
     AddCommentSerializer,
     CommentSerializer,
+    CreateBookmarkSerializer,
     CreatePostSerializer,
     LikeCommentSerializer,
     LikePostSerializer,
@@ -186,4 +188,65 @@ class LikeCommentView(LikeView):
         return Response(
             {"status": True, "message": message, "result": data},
             status=status.HTTP_200_OK,
+        )
+
+
+class BookmarkView(APIView):
+    serializer_class = CreateBookmarkSerializer
+
+    def get(self, request):
+        """
+        Provides all the posts that have been saved by the currently logged in user
+        """
+
+        my_bookmark = Bookmark.objects.filter(user_id=request.user_id).values("post_id")
+
+        _ids = [item["post_id"] for item in my_bookmark]
+
+        posts = Post.objects.filter(id__in=_ids)
+
+        serializer = PostSerializer(posts, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        """
+        Add a post to bookmark or saved post
+        """
+        serializer = CreateBookmarkSerializer(data=request.data)
+
+        if serializer.is_valid():
+            post_id = serializer.validated_data.get("post_id")
+            post = get_object_or_404(Post, id=post_id)
+
+            Bookmark.objects.create(user_id=request.user_id, post=post)
+            serializer = PostSerializer(post)
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(ErrorResponse("Validation error", serializer.errors))
+
+    def delete(self, request):
+        """
+        Delete selected bookmarks
+
+        Example request body:
+
+            {
+                "post_ids" : [
+
+                    "c0330839-f30c-4667-951c-2811e5e09bdf",
+
+                    "d59a5194-2cab-4e1c-8642-d549f5c65b86"
+                ]
+            }
+
+        """
+
+        post_id_list = request.data["post_ids"]
+
+        Bookmark.objects.filter(post_id__in=post_id_list).delete()
+
+        return Response(
+            {"detail": "bookmarks removed successfully"},
+            status=status.HTTP_204_NO_CONTENT,
         )
