@@ -41,8 +41,7 @@ class PostViewSet(ModelViewSet):
     # ordering_fields = ["category"]
 
     @action(methods=["GET"], detail=False)
-    # @method_decorator(cache_page(timedelta(hours=1).total_seconds()))
-    # @method_decorator(vary_on_headers("Authorization",))
+    @method_decorator(custom_cache_decorator)
     def mine(self, request):
         """
         Returns all the apartments owned by the currently logged in agent
@@ -79,7 +78,7 @@ class PostViewSet(ModelViewSet):
             return CreatePostSerializer
         return PostSerializer
 
-    # @method_decorator(custom_cache_decorator)
+    @method_decorator(custom_cache_decorator)
     def list(self, request: HttpRequest, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 

@@ -34,11 +34,10 @@ STORAGES = {
     }
 }
 
-REDIS_URL = ""
 
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': REDIS_URL,
+        'LOCATION': config("REDIS_URL", ""),
     }
 }
