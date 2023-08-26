@@ -53,6 +53,6 @@ EXPOSE 8000
 
 
 # CMD ["gunicorn", "--bind", ":8000","Talknaw.wsgi:application"]
-CMD [ "python3", "manage.py", "runserver" ]
+CMD [ "python3", "manage.py", "runserver" ] 
 
 
