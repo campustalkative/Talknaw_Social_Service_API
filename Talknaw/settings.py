@@ -206,3 +206,13 @@ LOGGING = {
         },
     },
 }
+
+DEBUG = config("DEBUG", False, cast = bool)
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': config("REDIS_URL", ""),
+    }
+}
