@@ -20,7 +20,6 @@ class ProfileView(GenericAPIView):
         profile = Profile.objects.get(user_id=request.user_id)
 
         serializer = ProfileSerializer(profile)
-
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request):

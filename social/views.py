@@ -13,7 +13,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from likes.views import LikeView
 from users.models import Profile
-from utils.exception_handlers import ErrorResponse
+from utils.exception_handlers import ErrorResponse, ErrorEnum
 from utils.helpers import custom_cache_decorator
 
 # from .filters import ApartmentFilter
@@ -92,6 +92,7 @@ class PostViewSet(ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
+        1/0
         profile = get_object_or_404(Profile, user_id=request.user_id)
         serializer = CreatePostSerializer(data=request.data)
 
@@ -119,10 +120,8 @@ class PostViewSet(ModelViewSet):
 
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        return Response(
-            ErrorResponse("Validation Error", serializer.errors),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        return ErrorResponse(ErrorEnum.ERR_001, serializer_errors=serializer.errors)  
+        
 
 
 class LikePostView(LikeView):
