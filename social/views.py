@@ -92,7 +92,6 @@ class PostViewSet(ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
-        1/0
         profile = get_object_or_404(Profile, user_id=request.user_id)
         serializer = CreatePostSerializer(data=request.data)
 
