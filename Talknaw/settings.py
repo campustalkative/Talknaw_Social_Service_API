@@ -204,7 +204,7 @@ LOGGING = {
     },
 }
 
-DEBUG = config("DEBUG", False, cast=bool)
+# DEBUG = config("DEBUG", False, cast=bool)
 
 
 CACHES = {

@@ -10,8 +10,15 @@ class Profile(models.Model):
     name = models.CharField(max_length=550)
     username = models.CharField(max_length=550)
     picture = models.CharField(max_length=550, null=True, blank=True)
-    bio = models.CharField(max_length=1000, null=True, blank=True)
+    bio = models.CharField(
+        max_length=1000,
+        default="",
+        blank=True,
+    )
     skills = models.ManyToManyField(Skill, blank=True)
+    is_verified = models.BooleanField(default=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField(auto_now=True)
 
     class Meta:
         indexes = [models.Index(fields=["username"]), models.Index(fields=["user_id"])]
@@ -29,9 +36,9 @@ class Profile(models.Model):
         skills = []
         for skill in self.skills.all():
             skills.append(skill.name)
-        
+
         return skills
-    
+
 
 class UserWatching(models.Model):
     user_id = models.ForeignKey(

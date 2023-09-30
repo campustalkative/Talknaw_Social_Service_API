@@ -86,6 +86,45 @@ class GetWatching(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class GetWatchersForUserView(APIView):
+    """
+    Get list of user's Following profile.
+    """
+
+    def get(self, request, user_id):
+        user_profile = get_object_or_404(Profile, user_id=user_id)
+
+        results = UserWatching.objects.filter(user_id=user_profile)
+
+        ids = [profile.watching_user_id.user_id for profile in results]
+
+        profiles = Profile.objects.filter(user_id__in=ids)
+
+        serializer = ProfileSerializer(profiles, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class GetWatchingForUserView(APIView):
+    """
+    Get the list of profiles a user is following
+    """
+
+    def get(self, request, user_id):
+        user_profile = get_object_or_404(Profile, user_id=user_id)
+
+        results = UserWatching.objects.filter(user_id=user_profile)
+
+        # TODO change the name of the field on the Userwatching model, it is confusing
+        ids = [profile.user_id.user_id for profile in results]
+
+        profiles = Profile.objects.filter(user_id__in=ids)
+
+        serializer = ProfileSerializer(profiles, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class StartWatching(APIView):
     """
     Start Following a user by passing the profile's user_id

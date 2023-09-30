@@ -13,7 +13,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from likes.views import LikeView
 from users.models import Profile
-from utils.exception_handlers import ErrorResponse, ErrorEnum
+from utils.exception_handlers import ErrorEnum, ErrorResponse
 from utils.helpers import custom_cache_decorator
 
 # from .filters import ApartmentFilter
@@ -34,17 +34,15 @@ class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
     lookup_field = "uid"
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
-    # filterset_class = ApartmentFilter #TODO update this to match this project
     http_method_names = ["get", "post", "patch", "delete"]
-    search_fields = ["content"]
+    search_fields = ["content", "profile__user_id", "profile__username"]
     pagination_class = PostPagination
-    # ordering_fields = ["category"]
 
-    @action(methods=["GET"], detail=False)
-    @method_decorator(custom_cache_decorator)
+    @action(methods=["GET"], detail=False, pagination_class=PostPagination)
+    # @method_decorator(custom_cache_decorator)
     def mine(self, request):
         """
-        Returns all the apartments owned by the currently logged in agent
+        Returns all the Posts owned by the currently logged in agent
 
         """
         profile = Profile.objects.get(user_id=request.user_id)
@@ -55,9 +53,12 @@ class PostViewSet(ModelViewSet):
             .select_related("profile")
         )
 
-        serializer = PostSerializer(posts, many=True)
+        paginator = self.pagination_class()
+        result_page = paginator.paginate_queryset(posts, request)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = PostSerializer(result_page, many=True)
+
+        return paginator.get_paginated_response(serializer.data)
 
     def get_queryset(self):
         return (
@@ -78,7 +79,7 @@ class PostViewSet(ModelViewSet):
             return CreatePostSerializer
         return PostSerializer
 
-    @method_decorator(custom_cache_decorator)
+    # @method_decorator(custom_cache_decorator) #? I need to create a new redis database instance on redis lab
     def list(self, request: HttpRequest, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -119,8 +120,7 @@ class PostViewSet(ModelViewSet):
 
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        return ErrorResponse(ErrorEnum.ERR_001, serializer_errors=serializer.errors)  
-        
+        return ErrorResponse(ErrorEnum.ERR_001, serializer_errors=serializer.errors)
 
 
 class LikePostView(LikeView):

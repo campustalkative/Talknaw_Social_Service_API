@@ -10,6 +10,8 @@ class ProfileSerializer(serializers.Serializer):
     watchers_count = serializers.IntegerField()
     watching_count = serializers.IntegerField()
     user_skills = serializers.JSONField()
+    date_created = serializers.DateTimeField()
+    is_verified = serializers.BooleanField()
 
 
 class ProfileUpdateSerializer(serializers.Serializer):
