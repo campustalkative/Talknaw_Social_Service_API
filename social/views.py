@@ -28,7 +28,7 @@ from .serializers import (
     LikePostSerializer,
     PostSerializer,
 )
-
+from django.db import transaction
 
 class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
@@ -98,27 +98,28 @@ class PostViewSet(ModelViewSet):
 
         if serializer.is_valid():
             # serializer.is_valid(raise_exception=True)
+            with transaction.atomic():
 
-            data = serializer.validated_data
+                data = serializer.validated_data
 
-            images = data.pop("pictures", [])
-            videos = data.pop("videos", [])
+                images = data.pop("pictures", [])
+                videos = data.pop("videos", [])
 
-            new_post = Post.objects.create(**data, profile=profile)
+                new_post = Post.objects.create(**data, profile=profile)
 
-            if images:
-                pics = [Picture(image=img, post=new_post) for img in images]
+                if images:
+                    pics = [Picture(image=img, post=new_post) for img in images]
 
-                Picture.objects.bulk_create(pics)
+                    Picture.objects.bulk_create(pics)
+                    
+                if videos:
+                    vids = [Video(clip=clip, post=new_post) for clip in videos]
 
-            if videos:
-                vids = [Video(clip=clip, post=new_post) for clip in videos]
+                    Video.objects.bulk_create(vids)
 
-                Video.objects.bulk_create(vids)
+                serializer = PostSerializer(new_post)
 
-            serializer = PostSerializer(new_post)
-
-            return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response(serializer.data, status=status.HTTP_200_OK)
 
         return ErrorResponse(ErrorEnum.ERR_001, serializer_errors=serializer.errors)
 

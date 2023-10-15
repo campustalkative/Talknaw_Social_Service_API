@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "cloudinary_storage",
+    "cloudinary",
     "drf_spectacular",
     "corsheaders",
     "debug_toolbar",
@@ -104,7 +106,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "core.permissions.IsAuthenticated",
     ],
-    "EXCEPTION_HANDLER": "utils.exception_handlers.custom_exception_handler",
+    # "EXCEPTION_HANDLER": "utils.exception_handlers.custom_exception_handler",
 }
 
 # Password validation
@@ -131,7 +133,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+# TIME_ZONE = "UTC"
+TIME_ZONE ="Africa/Lagos"
 
 USE_I18N = True
 
@@ -140,6 +143,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"

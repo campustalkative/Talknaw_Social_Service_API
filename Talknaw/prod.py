@@ -58,3 +58,11 @@ sentry_sdk.init(
     # We recommend adjusting this value in production,
     profiles_sample_rate=1.0,
 )
+
+
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": config("CLOUD_CLOUD_NAME", cast=str),
+    "API_KEY": config("CLOUD_API_KEY", cast=str),
+    "API_SECRET": config("CLOUD_API_SECRET", cast=str),
+}

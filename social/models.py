@@ -1,5 +1,10 @@
 from uuid import uuid4
 
+from cloudinary_storage.storage import (
+    RawMediaCloudinaryStorage,
+    VideoMediaCloudinaryStorage,
+)
+from cloudinary_storage.validators import validate_video
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from hitcount.models import (  # This will add a reverse lookup from HitCount Model
@@ -23,8 +28,12 @@ class Post(BaseModel, HitCountMixin):
     uid = models.UUIDField(default=uuid4, editable=False)
 
     content = models.TextField()
-    voice_recording = models.CharField(max_length=500, null=True, blank=True)
-    # user_id = models.UUIDField()
+    voice_recording = models.ImageField(
+        upload_to="recordings/",
+        blank=True,
+        null=True,
+        storage=RawMediaCloudinaryStorage(),
+    )
     expiry = models.DateTimeField(null=True)
     likes = GenericRelation(Like)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="posts")
@@ -55,12 +64,18 @@ class Post(BaseModel, HitCountMixin):
 
 
 class Picture(BaseModel):
-    image = models.CharField(max_length=500)
+    image = models.ImageField(upload_to="images/", blank=True, null=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="pictures")
 
 
 class Video(BaseModel):
-    clip = models.CharField(max_length=500, null=True, blank=True)
+    clip = models.ImageField(
+        upload_to="videos/",
+        blank=True,
+        null=True,
+        storage=VideoMediaCloudinaryStorage(),
+        validators=[validate_video],
+    )
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="videos")
 
 
@@ -84,6 +99,5 @@ class Comment(BaseModel):
 
 
 class Bookmark(models.Model):
-
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    user_id  = models.UUIDField()
+    user_id = models.UUIDField()

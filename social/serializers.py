@@ -1,10 +1,10 @@
 from rest_framework import serializers
 
-from likes.serializers import LikeSerializer
 from likes.models import Like
+from likes.serializers import LikeSerializer
 from users.views import ProfileSerializer
 
-from .models import Comment, Picture, Post, Video, Bookmark
+from .models import Bookmark, Comment, Picture, Post, Video
 
 
 class PictureSerializer(serializers.ModelSerializer):
@@ -40,19 +40,25 @@ class PostSerializer(serializers.ModelSerializer):
         ]
 
     def get_pictures(self, obj):
-        return [picture.image for picture in obj.pictures.all()]
+        return [picture.image.url for picture in obj.pictures.all()]
 
     def get_videos(self, obj):
-        return [video.clip for video in obj.videos.all()]
+        return [video.clip.url for video in obj.videos.all()]
 
 
 class CreatePostSerializer(serializers.Serializer):
     content = serializers.CharField()
-    pictures = serializers.ListField(child=serializers.CharField())
-    videos = serializers.ListField(child=serializers.CharField())
-    voice_recording = serializers.CharField()
-
-
+    pictures = serializers.ListField(
+        child=serializers.ImageField(allow_empty_file=True, required=False),
+        allow_empty=True,
+        required=False,
+    )
+    videos = serializers.ListField(
+        child=serializers.FileField(allow_empty_file=True, required=False),
+        allow_empty=True,
+        required=False,
+    )
+    voice_recording = serializers.FileField(allow_empty_file=True, required=False)
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -86,7 +92,5 @@ class LikeCommentSerializer(LikeSerializer):
         fields = ["id", "comment_id"]
 
 
-
 class CreateBookmarkSerializer(serializers.Serializer):
     post_id = serializers.UUIDField()
-    
