@@ -62,7 +62,7 @@ sentry_sdk.init(
 
 
 CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": config("CLOUD_CLOUD_NAME", cast=str),
-    "API_KEY": config("CLOUD_API_KEY", cast=str),
-    "API_SECRET": config("CLOUD_API_SECRET", cast=str),
+    "CLOUD_NAME": config("CLOUD_NAME"),
+    "API_KEY": config("CLOUD_API_KEY"),
+    "API_SECRET": config("CLOUD_API_SECRET"),
 }
