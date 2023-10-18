@@ -1,3 +1,5 @@
+from django.db import transaction
+from django.http import Http404, HttpRequest
 from django.http.request import HttpRequest
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
@@ -28,7 +30,7 @@ from .serializers import (
     LikePostSerializer,
     PostSerializer,
 )
-from django.db import transaction
+
 
 class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
@@ -99,7 +101,6 @@ class PostViewSet(ModelViewSet):
         if serializer.is_valid():
             # serializer.is_valid(raise_exception=True)
             with transaction.atomic():
-
                 data = serializer.validated_data
 
                 images = data.pop("pictures", [])
@@ -111,7 +112,7 @@ class PostViewSet(ModelViewSet):
                     pics = [Picture(image=img, post=new_post) for img in images]
 
                     Picture.objects.bulk_create(pics)
-                    
+
                 if videos:
                     vids = [Video(clip=clip, post=new_post) for clip in videos]
 
@@ -122,6 +123,24 @@ class PostViewSet(ModelViewSet):
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
         return ErrorResponse(ErrorEnum.ERR_001, serializer_errors=serializer.errors)
+
+    def destroy(self, request: HttpRequest, *args, **kwargs):
+        full_path = request.get_full_path()
+        post_id = full_path.split("/")[4]
+        try:
+            post = get_object_or_404(
+                Post, uid=post_id, profile__user_id=request.user_id
+            )
+            post.delete()
+
+            return Response(
+                {"status": True, "message": "Post deleted"}, status=status.HTTP_200_OK
+            )
+        except Http404:
+            return ErrorResponse(
+                ErrorEnum.ERR_006,
+                extra_detail="Post does not exist or you do not own this post",
+            )
 
 
 class LikePostView(LikeView):

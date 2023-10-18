@@ -27,7 +27,7 @@ class BaseModel(models.Model):
 class Post(BaseModel, HitCountMixin):
     uid = models.UUIDField(default=uuid4, editable=False)
 
-    content = models.TextField()
+    content = models.TextField(null=True, blank=True)
     voice_recording = models.ImageField(
         upload_to="recordings/",
         blank=True,
@@ -46,7 +46,8 @@ class Post(BaseModel, HitCountMixin):
         ordering = ["-date_created"]
 
     def __str__(self):
-        return self.content[:]
+
+        return f"{self.uid}-{self.content[:]}"
 
     # @property
     # def views(self):
