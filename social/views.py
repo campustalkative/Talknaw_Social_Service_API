@@ -41,7 +41,7 @@ class PostViewSet(ModelViewSet):
     pagination_class = PostPagination
 
     @action(methods=["GET"], detail=False, pagination_class=PostPagination)
-    # @method_decorator(custom_cache_decorator)
+    @method_decorator(custom_cache_decorator)
     def mine(self, request):
         """
         Returns all the Posts owned by the currently logged in agent
@@ -81,7 +81,7 @@ class PostViewSet(ModelViewSet):
             return CreatePostSerializer
         return PostSerializer
 
-    # @method_decorator(custom_cache_decorator) #? I need to create a new redis database instance on redis lab
+    @method_decorator(custom_cache_decorator) #? I need to create a new redis database instance on redis lab
     def list(self, request: HttpRequest, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
