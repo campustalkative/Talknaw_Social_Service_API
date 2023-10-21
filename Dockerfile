@@ -1,5 +1,8 @@
 FROM python:3.10-slim
 
+# Update the package list and install libmagic for python-magic and cloudinary
+RUN apt-get update && apt-get install -y libmagic1
+
 WORKDIR /app
 
 
@@ -8,7 +11,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 
-COPY requirements.txt requirements.txt
+COPY requirements.dev.txt requirements.txt
 
 
 RUN pip install -r requirements.txt  
@@ -52,7 +55,7 @@ RUN python3 manage.py migrate
 EXPOSE 8000
 
 
-# CMD ["gunicorn", "--bind", ":8000","Talknaw.wsgi:application"]
-CMD [ "python3", "manage.py", "runserver" ] 
+CMD ["gunicorn", "--bind", ":8000","Talknaw.wsgi:application"]
+# CMD [ "python3", "manage.py", "runserver" ] 
 
 
