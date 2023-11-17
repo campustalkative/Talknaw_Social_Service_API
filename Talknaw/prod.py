@@ -10,7 +10,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", config("SECRET_KEY", SECRET_KEY))
 
 DEBUG = config("DEBUG", False, cast=bool)
 
-ALLOWED_HOSTS = ["talknawsocial.cleverapps.io"]
+ALLOWED_HOSTS = ["talknawsocial.cleverapps.io", "talknaw-social.cleverapps.io"]
 
 CSRF_TRUSTED_ORIGINS = ["https://" + host for host in ALLOWED_HOSTS]
 
